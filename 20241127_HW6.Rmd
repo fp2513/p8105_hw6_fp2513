@@ -185,3 +185,20 @@ print(city_state_df)
 
 ```
 
+```{r}
+ggplot(city_state_df, aes(x = reorder(city_state, odds_ratio), y = odds_ratio)) +
+  geom_point() +  
+  geom_errorbar(aes(ymin = lower_ci, ymax = upper_ci), width = 0.2) + 
+  labs(
+    x = "City, State", 
+    y = "Adjusted Odds Ratio (OR) for Male Victims vs Female Victims", 
+    title = "Adjusted Odds Ratios for Solving Homicides: Male vs Female Victims",
+    caption = "Error bars represent 95% confidence intervals") +
+  coord_flip() +
+  theme_minimal()+ 
+  theme(
+    axis.text.y = element_text(size = 8), 
+    axis.title = element_text(size = 10)
+  )
+```
+
