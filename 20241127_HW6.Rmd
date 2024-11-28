@@ -108,5 +108,26 @@ print(paste("95% CI for log(b0 * b1):", round(log_b0_b1_ci[1], 4), "-", round(lo
 
 ## Problem 2
 
+```{r}
+homicide_df = 
+  read_csv(file = "data/homicide-data.csv", na = c("NA", ",", ".")) %>% 
+  janitor::clean_names() %>% 
+  mutate(
+    city_state = str_c(city, ", ", state),
+    solved = ifelse(disposition %in% c("Closed without arrest", "Closed by arrest"), 1, 0),  
+    victim_age = as.numeric(victim_age)  
+  ) %>% 
+  filter(
+    victim_race %in% c("White", "Black"),  
+    !is.na(victim_age),  
+    !city_state %in% c('Dallas, TX', 'Phoenix, AZ', 'Kansas City, MO', 'Tulsa, AL')  
+  )
 
+```
+
+
+```{r}
+
+
+```
 
