@@ -78,6 +78,8 @@ ggplot(bootstrap_df, aes(x = R_squared)) +
   theme_minimal()
 ```
 
+The histogram plot for the R^2 values resulting from the 5000 bootstrap shows a unimodal distribution, centered around the mean of the bootstrap R^2 values. Additionally, the mean of the bootstrap R^2 values should be very close to the R^2 value of the original weather dataframe that we bootstrapped 5000 samples from. Most R^2 values lie within a range indicating a good fit of the linear model. The variability is due to the resampling process of bootstrapping. 
+
 
 ```{r}
 ggplot(bootstrap_df, aes(x = log_b0_b1)) +
@@ -87,4 +89,6 @@ ggplot(bootstrap_df, aes(x = log_b0_b1)) +
        y = "Frequency") +
   theme_minimal()
 ```
+
+
 
