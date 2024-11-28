@@ -12,6 +12,7 @@ library(broom)
 library(purrr)
 library(tidyverse)
 library(modelr)
+library(tidymodels)
 ```
 
 ## Problem 1
@@ -236,9 +237,13 @@ birth_missing_data
 
 The variables that I have selected for my regression model for birthweight include:
 
-* Mum's age at delivery (momage)
+* Baby's sex (birthweight could differ based on sex)
 
 * Gestational age (gaweeks)
+
+* Weight gain of the mother (wtgain) and whether the mother smoked during pregnancy (smoken) could also heavily influence fetal development. 
+
+* (malform) presence of malformations that could affect weight
 
 * Two variables for previous pregnancy history (pnumlbw, pnumsga) as previous complications with pregnancies may influence the outcome of the current pregnancy, and therefore birth weight 
 
@@ -248,7 +253,7 @@ The variables that I have selected for my regression model for birthweight inclu
 Next, fit a linear regression model where bwt is the dependent variable, and the independent variables are the ones identified above.
 
 ```{r}
-birthweight_model = lm(bwt ~ momage + ppbmi + wtgain + smoken + gaweeks + pnumlbw + pnumsga + bhead, data = birthweight_df)
+birthweight_model = lm(bwt ~ babysex + wtgain + smoken + gaweeks + pnumlbw + pnumsga + bhead + blength + malform, data = birthweight_df)
 
 summary(birthweight_model)
 
@@ -268,3 +273,79 @@ ggplot(birthweight_df, aes(x = pred, y = resid)) +
   labs(x = "Fitted Values", y = "Residuals", title = "Residuals vs Fitted Values")
 ```
 
+It's common for birth weight to cluster around this "average" or "typical" value, here it seems to be about 3000g 
+
+
+Comparing my model to other models:
+
+1. My model that incorporates babysex + wtgain + smoken + gaweeks + pnumlbw + pnumsga + bhead + blength + malform
+
+2. Model 2: uses length at birth (blength) and gestational age (gaweeks) as predictors, considering only their main effects.
+
+3. Model 3: includes head circumference (bhead), length at birth (blength), baby's sex (babysex), and their interaction terms, including a three-way interaction between bhead, blength, and babysex.
+
+Cross validation will estimate the prediction error for each of these models. 
+
+Steps to take:
+
+1. Create the three models 
+
+2. Set up the Monte Carlo Cross-Validation to generate training/test splits
+
+3. Train each model on the training data and predict on the test data
+
+4. Calculate the prediction error for each model 
+
+5. Compare the models through their cross-validation results
+
+
+```{r}
+set.seed(123)
+
+cv_folds = mc_cv(birthweight_df, times = 100, strata = "bwt")
+
+formula_model1 = bwt ~ babysex + wtgain + smoken + gaweeks + pnumlbw + pnumsga + bhead + blength + malform
+formula_model2 = bwt ~ blength + gaweeks
+formula_model3 = bwt ~ bhead * blength * babysex
+
+mse = function(formula, split) {
+  model_fit = lm(formula, data = analysis(split))
+  
+  preds = predict(model_fit, newdata = assessment(split))
+  
+  sqrt(mean((preds - assessment(split)$bwt)^2))
+}
+
+cv_results = map_dfr(list(
+    model1 = formula_model1,
+    model2 = formula_model2,
+    model3 = formula_model3
+  ), 
+  ~ map_dfr(cv_folds$splits, function(split) {
+    
+    tibble(model = deparse(substitute(.x)), mse = mse(.x, split))
+  }), 
+  .id = "model"
+)
+
+cv_results_summary = cv_results %>%
+  group_by(model) %>%
+  summarise(mean_mse = mean(mse))
+
+print(cv_results_summary)
+
+```
+
+
+```{r}
+ggplot(cv_results_summary, aes(x = model, y = mean_mse, fill = model)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Comparison of Models Based on Cross-Validated Prediction Error",
+       x = "Model",
+       y = "Mean Squared Error (MSE)") +
+  theme_minimal()
+```
+
+The mean MSE for each model gives an estimate of how well each model predicts the birth weight of children across all cross-validation splits.
+
+Where specifically a lower MSE indicates a better predictive model.
