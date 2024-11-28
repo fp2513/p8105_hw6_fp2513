@@ -127,7 +127,31 @@ homicide_df =
 
 
 ```{r}
+baltimore_data = homicide_df %>%
+  filter(city_state == "Baltimore, MD")
 
+baltimore_model = glm(solved ~ victim_age + victim_sex + victim_race, 
+                       data = baltimore_data, 
+                       family = binomial())
+
+summary(baltimore_model)
+
+```
+
+
+Baltimore regression
+
+```{r}
+tidy_baltimore_model = tidy(baltimore_model)
+sex_coeff_bal = tidy_baltimore_model %>% 
+  filter(term == "victim_sexMale")
+
+odds_ratio_bal = exp(sex_coeff_bal$estimate)
+lower_ci_sex_bal = exp(sex_coeff_bal$estimate - 1.96 * sex_coeff_bal$std.error)
+upper_ci_sex_bal = exp(sex_coeff_bal$estimate + 1.96 * sex_coeff_bal$std.error)
+
+cat("Adjusted Odds Ratio for solving homicides comparing male victims to female victims: ", odds_ratio_bal, "\n")
+cat("95% Confidence Interval: [", lower_ci_sex_bal, ", ", upper_ci_sex_bal, "]", "\n")
 
 ```
 
