@@ -236,7 +236,7 @@ birth_missing_data
 
 The variables that I have selected for my regression model for birthweight include:
 
-* A group of mum's characteristics such as Age at delivery (momage), pre-pregnancy BMI (ppbmi), weight gain during pregnancy (wtgain), and smoking behavior (smoken).
+* Mum's age at delivery (momage)
 
 * Gestational age (gaweeks)
 
@@ -248,7 +248,7 @@ The variables that I have selected for my regression model for birthweight inclu
 Next, fit a linear regression model where bwt is the dependent variable, and the independent variables are the ones identified above.
 
 ```{r}
-birthweight_model = lm(bwt ~ momage + ppbmi + smoken + gaweeks + pnumlbw + pnumsga + bhead + blength, data = birthweight_df)
+birthweight_model = lm(bwt ~ momage + ppbmi + wtgain + smoken + gaweeks + pnumlbw + pnumsga + bhead, data = birthweight_df)
 
 summary(birthweight_model)
 
@@ -259,4 +259,12 @@ birthweight_df =
 
 ```
 
+Plotting residuals against fitted values
+
+```{r}
+ggplot(birthweight_df, aes(x = pred, y = resid)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "loess", se = FALSE, color = "red") +
+  labs(x = "Fitted Values", y = "Residuals", title = "Residuals vs Fitted Values")
+```
 
