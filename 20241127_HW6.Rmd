@@ -105,3 +105,8 @@ print(paste("95% CI for log(b0 * b1):", round(log_b0_b1_ci[1], 4), "-", round(lo
 
 ```
 
+
+## Problem 2
+
+
+
