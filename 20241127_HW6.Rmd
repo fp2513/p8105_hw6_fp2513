@@ -11,6 +11,7 @@ library(rnoaa)
 library(broom)
 library(purrr)
 library(tidyverse)
+library(modelr)
 ```
 
 ## Problem 1
@@ -231,4 +232,31 @@ birth_missing_data = colSums(is.na(birthweight_df))
 birth_missing_data
 
 ```
+
+
+The variables that I have selected for my regression model for birthweight include:
+
+* A group of mum's characteristics such as Age at delivery (momage), pre-pregnancy BMI (ppbmi), weight gain during pregnancy (wtgain), and smoking behavior (smoken).
+
+* Gestational age (gaweeks)
+
+* Two variables for previous pregnancy history (pnumlbw, pnumsga) as previous complications with pregnancies may influence the outcome of the current pregnancy, and therefore birth weight 
+
+* Lastly, head circumference at birth (bhead) and baby's length at birth (blength). I think having an idea of the head circumference and length could indicate fetal development and be correlated with birthweight.
+
+
+Next, fit a linear regression model where bwt is the dependent variable, and the independent variables are the ones identified above.
+
+```{r}
+birthweight_model = lm(bwt ~ momage + ppbmi + smoken + gaweeks + pnumlbw + pnumsga + bhead + blength, data = birthweight_df)
+
+summary(birthweight_model)
+
+birthweight_df = 
+  birthweight_df %>%
+  add_predictions(birthweight_model) %>%
+  add_residuals(birthweight_model)
+
+```
+
 
