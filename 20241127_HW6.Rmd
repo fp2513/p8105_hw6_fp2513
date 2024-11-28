@@ -155,3 +155,33 @@ cat("95% Confidence Interval: [", lower_ci_sex_bal, ", ", upper_ci_sex_bal, "]",
 
 ```
 
+
+Regression for each city 
+
+
+```{r}
+city_state_df = homicide_df %>%
+  group_by(city_state) %>%
+  nest() %>%  
+  mutate(
+    
+    model = map(data, ~ glm(solved ~ victim_age + victim_sex + victim_race, data = .x, family = "binomial")),  
+    
+    tidy_results = map(model, tidy)  
+  ) %>%
+  unnest(tidy_results) %>%
+  filter(term == "victim_sexMale")  
+
+city_state_df = 
+  city_state_df %>%
+  mutate(
+    odds_ratio = exp(estimate),  
+    lower_ci = exp(estimate - 1.96 * std.error),  
+    upper_ci = exp(estimate + 1.96 * std.error)   
+  ) %>%
+  select(city_state, odds_ratio, lower_ci, upper_ci)  
+
+print(city_state_df)
+
+```
+
