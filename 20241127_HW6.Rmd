@@ -94,3 +94,14 @@ This distribution is somewhat symmetric, where the mean or median of the bootstr
 
 We can also learn that from the sign of b0^ and b1^ product being a positive value that this helps to reinforce the idea of a positive relationship between tmin and tmax
 
+
+```{r}
+r_squared_ci = quantile(bootstrap_df$R_squared, c(0.025, 0.975))
+print(paste("95% CI for R^2:", round(r_squared_ci[1], 4), "-", round(r_squared_ci[2], 4)))
+
+
+log_b0_b1_ci = quantile(bootstrap_df$log_b0_b1, c(0.025, 0.975))
+print(paste("95% CI for log(b0 * b1):", round(log_b0_b1_ci[1], 4), "-", round(log_b0_b1_ci[2], 4)))
+
+```
+
