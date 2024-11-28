@@ -90,5 +90,7 @@ ggplot(bootstrap_df, aes(x = log_b0_b1)) +
   theme_minimal()
 ```
 
+This distribution is somewhat symmetric, where the mean or median of the bootstrap distribution (2.0) shows a clear central eestimate of the log product of b0^ and b1^. This means that the combined effect of these two parameters has a central tendancy. 
 
+We can also learn that from the sign of b0^ and b1^ product being a positive value that this helps to reinforce the idea of a positive relationship between tmin and tmax
 
